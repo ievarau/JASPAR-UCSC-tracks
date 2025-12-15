@@ -1,5 +1,5 @@
-table hg18KGchr7
-"UCSC Genes for chr7 with color plus GeneSymbol and SwissProtID"
+table JASPAR_TFBSs
+"JASPAR TFBSs genome tracks"
 (
 string  chrom;		"Reference sequence chromosome or scaffold"
 uint    chromStart;	"Start position of feature on chromosome"
