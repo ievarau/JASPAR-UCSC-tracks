@@ -13,6 +13,8 @@
 SOFT="scans2bigBed"
 VERSION="2.0.1"
 
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 function usage {
     echo -e "usage: $SOFT -c CHROM_SIZES -i INPUT_DIR [-h]"
 }
@@ -119,8 +121,8 @@ LC_ALL=C sort --parallel=$THREADS --buffer-size=${MEM}G -T $DUMMY_DIR -k1,1 -k2,
 ##
 ## Create bigBed
 ##
-bedToBigBed -as=bed_config.as -type=bed6+1 -extraIndex=TFName -tab $SORTED_BED_FILE $CHROM_SIZES $OUT_FILE
-
+# bedToBigBed -as=bed_config.as -type=bed6+1 -extraIndex=TFName -tab $SORTED_BED_FILE $CHROM_SIZES $OUT_FILE
+bedToBigBed -as="$SCRIPT_DIR/bed_config.as" -type=bed6+1 -extraIndex=TFName -tab $SORTED_BED_FILE $CHROM_SIZES $OUT_FILE
 ##
 ## Remove sorted BED file
 ##
