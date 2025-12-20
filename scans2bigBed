@@ -28,6 +28,7 @@ function help {
     echo 
     echo "optional arguments:"
     echo "  -h, --help          show this help message and exit"
+    echo "  -a MAX_ALLOC        max memory allocation for bedToBigBed (default = 25000000000)"
     echo "  -d DUMMY_DIR        dummy directory (default = /tmp/)"
     echo "  -m MEM              memory to use (in Gb; default = 4)"
     echo "  -o OUT_FILE         output file (default = ./bigBed.bb)"
@@ -51,6 +52,7 @@ function opts_error {
 ##################### Inputs #####################
 
 DUMMY_DIR=/tmp
+MAX_ALLOC=25000000000
 OUT_FILE=./bigBed.bb
 THREADS=1
 
@@ -60,11 +62,12 @@ then
     exit
 fi
 
-while getopts ":c:i:d:m:o:t:vh" OPT
+while getopts ":c:i:a:d:m:o:t:vh" OPT
 do
     case $OPT in
 	c) CHROM_SIZES=$OPTARG;;
 	i) INPUT_DIR=$OPTARG;;
+	a) MAX_ALLOC=$OPTARG;;
 	d) DUMMY_DIR=$OPTARG;;
 	m) MEM=$OPTARG;;
 	o) OUT_FILE=$OPTARG;;
@@ -121,7 +124,7 @@ LC_ALL=C sort --parallel=$THREADS --buffer-size=${MEM}G -T $DUMMY_DIR -k1,1 -k2,
 ##
 ## Create bigBed
 ##
-bedToBigBed -maxAlloc=25000000000 -as="$SCRIPT_DIR/bed_config.as" -type=bed6+1 -extraIndex=TFName -tab $SORTED_BED_FILE $CHROM_SIZES $OUT_FILE
+bedToBigBed -maxAlloc=$MAX_ALLOC -as="$SCRIPT_DIR/bed_config.as" -type=bed6+1 -extraIndex=TFName -tab $SORTED_BED_FILE $CHROM_SIZES $OUT_FILE
 ##
 ## Remove sorted BED file
 ##
