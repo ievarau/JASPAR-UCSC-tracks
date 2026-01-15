@@ -95,27 +95,20 @@ GENOME=$(basename "$CHROM_SIZES" .fa.sizes)
 ##
 BED_FILE=$DUMMY_DIR/$GENOME.bed
 SORTED_BED_FILE=$DUMMY_DIR/$GENOME.sorted.bed
-VALID_CHROMS=$DUMMY_DIR/$GENOME.valid_chroms.txt
 
 ##
-## Extract valid chromosomes from chrom.sizes file
-##
-cut -f1 "$CHROM_SIZES" > "$VALID_CHROMS"
-
-##
-## Merge all TFBSs into an unsorted BED file (filtering by valid chromosomes)
+## Merge all TFBSs into an unsorted BED file
 ##
 for FILE in $INPUT_DIR/*.tsv.gz; do
     # 1. Capture the matrix ID
     MATRIX_ID=$(basename "$FILE" .tsv.gz)
     # 2. Process the file, inserting the matrix ID between columns 3 and 4,
     # and adding the TF name as the last column
-    # 3. Filter to keep only chromosomes present in chrom.sizes
     zless "$FILE" | cut -f 1-4,6-7 | \
     awk -v MATRIX_ID="$MATRIX_ID" 'BEGIN{OFS="\t"; max=1000} {
         if($5 > max){ $5 = max } # cap the value
         print $1"\t"$2"\t"$3"\t"MATRIX_ID"\t"$5"\t"$6"\t"$4
-    }' | grep -Fwf "$VALID_CHROMS" >> "$BED_FILE"
+    }' >> "$BED_FILE"
 done
 
 ##
@@ -127,11 +120,6 @@ LC_ALL=C sort --parallel=$THREADS --buffer-size=${MEM}G -T $DUMMY_DIR -k1,1 -k2,
 ## Remove BED file
 ##
 #rm $BED_FILE
-
-##
-## Remove valid chromosomes file
-##
-rm "$VALID_CHROMS"
 
 ##
 ## Create bigBed
